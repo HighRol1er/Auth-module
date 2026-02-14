@@ -16,18 +16,12 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 });
-
-const dbProvider = {
-  provide: 'DATABASE',
-  useFactory: () => drizzle(pool, { schema }),
-};
-
 @Global()
 @Module({
   providers: [
     {
       provide: 'DATABASE',
-      useFactory: () => drizzle(pool, { schema }),
+      useFactory: () => drizzle(pool, { schema, logger: true }),
     },
     {
       provide: 'POOL',
@@ -40,7 +34,7 @@ export class DbModule implements OnModuleDestroy {
   constructor(@Inject('POOL') private readonly pool: Pool) {}
 
   async onModuleDestroy() {
-    await this.pool.end(); // 앱 종료 시 풀 닫기
+    await this.pool.end();
     console.log('DB Pool connection closed.');
   }
 }

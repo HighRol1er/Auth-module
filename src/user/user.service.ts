@@ -1,24 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import type { DB } from '@/db/db.module';
+
+import { Injectable, Inject } from '@nestjs/common';
+import { NewUser, users } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 // This should be a real class/interface representing a user entity
-export type User = any;
 
 @Injectable()
 export class UserService {
-  private readonly users = [
-    {
-      userId: 1,
-      username: 'john',
-      password: 'changeme',
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: 'guess',
-    },
-  ];
+  private readonly userSchema = users;
+  constructor(@Inject('DATABASE') private readonly db: DB) {}
 
-  async findOne(username: string): Promise<User | undefined> {
-    return this.users.find((user) => user.username === username);
+  async findOrCreateUser(data: NewUser) {
+    const [existingUser] = await this.db.select().from(this.userSchema).where(eq(users.email, data.email));
+
+    if (existingUser) return existingUser;
+
+    const [newUser] = await this.db.insert(users).values(data).returning();
+
+    return newUser;
   }
 }
