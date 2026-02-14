@@ -18,9 +18,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
   validate(accessToken: string, refreshToken: string, profile: any) {
     const { sub, email, given_name, family_name, picture } = profile._json;
 
-    // 1. 여기서 DB를 조회해서 유저가 없으면 생성(회원가입), 있으면 업데이트하는 로직을 보통 넣습니다.
-    // const user = await this.userService.findOrCreate({ googleId: sub, email, ... })
-
     const user = {
       googleId: sub,
       email: email,
