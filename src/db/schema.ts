@@ -11,6 +11,7 @@ export const users = pgTable('users', {
   email: varchar({ length: 255 }).notNull().unique(),
   picture: text(),
   role: userRoleEnum().default('user').notNull(),
+  refreshToken: text(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
