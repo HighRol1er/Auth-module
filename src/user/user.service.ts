@@ -8,7 +8,6 @@ import { eq } from 'drizzle-orm';
 @Injectable()
 export class UserService {
   private readonly userSchema = users;
-  private readonly logger = new Logger();
   constructor(@Inject('DATABASE') private readonly db: DB) {}
 
   async findUser(email: string): Promise<User | undefined> {
@@ -24,5 +23,14 @@ export class UserService {
     const [newUser] = await this.db.insert(users).values(data).returning();
 
     return newUser;
+  }
+
+  async findOneById(id: number) {
+    const result = await this.db.select().from(users).where(eq(users.id, id));
+    return result[0]; // 유저 정보 반환
+  }
+
+  async updateRefreshToken(id: number, refreshToken: string | null) {
+    await this.db.update(users).set({ refreshToken }).where(eq(users.id, id));
   }
 }
